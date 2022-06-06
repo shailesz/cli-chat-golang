@@ -1,34 +1,33 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/shailesz/cli-chat-golang/src/helpers"
+	"github.com/shailesz/cli-chat-golang/src/models"
+	"github.com/shailesz/cli-chat-golang/src/services"
 )
 
 // CreateUser creates a user.
 func CreateUser(u, p string) {
+	var waitResponse bool = true
 
-	hp := helpers.Sha256(p)
+	user := models.User{Username: u, Password: p}
 
-	rows := [][]interface{}{
-		{u, hp},
+	Socket.On("signup", func(res models.AuthMessage) {
+		if res.Status == 200 {
+			fmt.Println("Successfully signed up, please continue to login.")
+			services.WriteConfig(user)
+		} else {
+			fmt.Println("Something went wrong! Please try again.")
+		}
+		waitResponse = false
+	})
+
+	Socket.Emit("signup", user)
+
+	for {
+		if !waitResponse {
+			break
+		}
 	}
-
-	copyCount, err := Conn.CopyFrom(
-		context.TODO(),
-		pgx.Identifier{"users"},
-		[]string{"username", "password"},
-		pgx.CopyFromRows(rows),
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to create user: %v\n", err)
-		os.Exit(1)
-	}
-
-	log.Println("user created successfully!", copyCount)
 }

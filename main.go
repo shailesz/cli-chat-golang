@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +10,9 @@ import (
 	"time"
 
 	"github.com/shailesz/cli-chat-golang/cmd"
+	"github.com/shailesz/cli-chat-golang/src/constants"
 	"github.com/shailesz/cli-chat-golang/src/controllers"
+	"github.com/shailesz/cli-chat-golang/src/helpers"
 	"github.com/shailesz/cli-chat-golang/src/models"
 )
 
@@ -79,35 +80,26 @@ func timeconv(timestamp int64) time.Time {
 
 func main() {
 
+	// execute command
+	cmd.Execute()
+
 	config := readConfig()
 
-	socket := controllers.OpenConnection()
-
-	config.Login(socket)
+	config.Login(controllers.Socket)
 
 	CallClear()
-	fmt.Println("Welcome to chatroom! type and press enter to chat...")
+	helpers.WelcomeText()
 
-	socket.On("message", func(chat models.ChatMessage) {
+	controllers.Socket.On("message", func(chat models.ChatMessage) {
 		if chat.Username != config.Username {
-			fmt.Println(chat.ToString())
+			helpers.ClearLine()
+			fmt.Println(constants.PURPLE_TERMINAL_COLOR + chat.ToString() + constants.RESET_TERMINAL_COLOR)
+			helpers.Prompt()
 		}
 	})
 
-	reader := bufio.NewReader(os.Stdin)
-
-	for {
-		data, _, _ := reader.ReadLine()
-		fmt.Fprint(os.Stdout, "\r \r")
-		command := string(data)
-		socket.Emit("chat", models.ChatMessage{Username: config.Username, Data: command, Timestamp: time.Now().UnixNano()})
-
-		if command == "quit" {
-			break
-		}
-	}
+	controllers.HandleChatInput(config)
 
 	defer controllers.Conn.Close()
 
-	cmd.Execute()
 }

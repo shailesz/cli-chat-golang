@@ -1,12 +1,10 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 
-	"github.com/shailesz/cli-chat-golang/src/controllers"
+	"github.com/shailesz/cli-chat-golang/src/helpers"
+	"github.com/shailesz/cli-chat-golang/src/services"
 	socketio_client "github.com/zhouhui8915/go-socket.io-client"
 )
 
@@ -24,9 +22,7 @@ func (c *Config) Update(u, p string) Config {
 	c.Username, c.Password = u, p
 
 	// write config file.
-	file, _ := json.MarshalIndent(c, "", " ")
-
-	_ = ioutil.WriteFile("config.json", file, 0644)
+	services.WriteConfig(c)
 
 	return Config{Username: u, Password: p}
 }
@@ -35,18 +31,13 @@ func (c *Config) Update(u, p string) Config {
 func (c *Config) Login(socket *socketio_client.Client) (string, string) {
 	var isWaiting, isUpdate bool
 	var u, p string
-	var err error
 
 	// handle configs from config file
 	if c.Username == "" || c.Password == "" {
-		fmt.Println("Please enter credentials to continue.")
-		u, p, err = controllers.Credentials()
+		u, p = helpers.GetCredentials()
 
 		isUpdate = true
 
-		if err != nil {
-			log.Panicln(err)
-		}
 	} else {
 		fmt.Println("Processing...")
 		u, p = c.Username, c.Password

@@ -1,26 +1,28 @@
 package controllers
 
 import (
-	"log"
+	"bufio"
+	"os"
+	"time"
 
-	socketio_client "github.com/zhouhui8915/go-socket.io-client"
+	"github.com/shailesz/cli-chat-golang/src/helpers"
+	"github.com/shailesz/cli-chat-golang/src/models"
 )
 
-// OpenConnection opens a websocket connection to server.
-func OpenConnection() *socketio_client.Client {
+func HandleChatInput(config models.Config) {
+	reader := bufio.NewReader(os.Stdin)
 
-	uri := "http://localhost:8000/socket.io/"
-
-	opts := &socketio_client.Options{
-		Transport: "websocket",
-		Query:     make(map[string]string),
+	for {
+		helpers.Prompt()
+		data, _, _ := reader.ReadLine()
+		message := string(data)
+		SendChat(config.Username, message)
+		if message == "$quit" {
+			break
+		}
 	}
+}
 
-	client, err := socketio_client.NewClient(uri, opts)
-	if err != nil {
-		log.Panicln(err)
-	}
-
-	return client
-
+func SendChat(u, m string) {
+	Socket.Emit("chat", models.ChatMessage{Username: u, Data: m, Timestamp: time.Now().UnixNano()})
 }
