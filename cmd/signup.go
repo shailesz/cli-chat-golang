@@ -18,11 +18,9 @@ var signupCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		u, p := helpers.GetCredentials()
 		controllers.CreateUser(u, p)
-
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(signupCmd)
-
 }

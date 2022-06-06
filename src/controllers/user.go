@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 
+	"github.com/shailesz/cli-chat-golang/src/helpers"
 	"github.com/shailesz/cli-chat-golang/src/models"
 	"github.com/shailesz/cli-chat-golang/src/services"
 )
@@ -30,4 +31,49 @@ func CreateUser(u, p string) {
 			break
 		}
 	}
+}
+
+// Login logs in user from config file.
+func Login(c models.Config) (string, string) {
+	var isWaiting, isUpdate bool
+	var u, p string
+
+	// handle configs from config file
+	if c.Username == "" || c.Password == "" {
+		u, p = helpers.GetCredentials()
+
+		isUpdate = true
+
+	} else {
+		fmt.Println("Processing...")
+		u, p = c.Username, c.Password
+		isUpdate = false
+	}
+
+	// listener for auth messages.
+	Socket.On("auth", func(message models.AuthMessage) {
+		if message.Status == 404 {
+			fmt.Println("You could not be authenticated. please try again.")
+		} else {
+			fmt.Println("Authenticated.")
+
+			if isUpdate {
+				c.Update(u, p)
+			}
+		}
+
+		isWaiting = false
+	})
+
+	isWaiting = true
+	Socket.Emit("auth", models.User{Username: u, Password: p})
+
+	// wait for auth message.
+	for {
+		if !isWaiting {
+			break
+		}
+	}
+
+	return u, p
 }
