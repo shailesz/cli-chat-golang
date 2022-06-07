@@ -1,6 +1,7 @@
 # cli-chat-golang
 CLI chat app is client side application to chat to people who are online and connected to the server.
-made using golang <3
+
+Built using golang <3
 
 ## Usage
 
