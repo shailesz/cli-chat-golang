@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"log"
+	"os"
 
 	"github.com/shailesz/cli-chat-golang/src/constants"
 	socketio_client "github.com/zhouhui8915/go-socket.io-client"
@@ -21,7 +22,8 @@ func OpenConnection() *socketio_client.Client {
 	// new client socket
 	client, err := socketio_client.NewClient(constants.WEBSOCKET_URI, opts)
 	if err != nil {
-		log.Panicln(err)
+		log.Println("Could not connect to server! Please try again.")
+		os.Exit(1)
 	}
 
 	return client
