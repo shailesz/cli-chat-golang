@@ -10,5 +10,6 @@ func main() {
 	// execute command
 	cmd.Execute()
 
+	// defer database connection close
 	defer controllers.Conn.Close()
 }

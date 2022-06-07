@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 )
 
+// WriteConfig writes config to file.
 func WriteConfig(data interface{}) {
 	file, _ := json.MarshalIndent(data, "", " ")
 

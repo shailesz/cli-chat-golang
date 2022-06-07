@@ -9,10 +9,10 @@ import (
 )
 
 // CreateUser creates a user.
-func CreateUser(u, p string) {
+func CreateUser(e, u, p string) {
 	var waitResponse bool = true
 
-	user := models.User{Username: u, Password: p}
+	user := models.User{Email: e, Username: u, Password: p}
 
 	Socket.On("signup", func(res models.AuthMessage) {
 		if res.Status == 200 {
@@ -40,7 +40,7 @@ func Login(c models.Config) (string, string) {
 
 	// handle configs from config file
 	if c.Username == "" || c.Password == "" {
-		u, p = helpers.GetCredentials()
+		_, u, p = helpers.GetCredentials(false)
 
 		isUpdate = true
 
@@ -66,7 +66,7 @@ func Login(c models.Config) (string, string) {
 	})
 
 	isWaiting = true
-	Socket.Emit("auth", models.User{Username: u, Password: p})
+	Socket.Emit("auth", models.User{Username: u, Password: p}) // send auth message to server
 
 	// wait for auth message.
 	for {

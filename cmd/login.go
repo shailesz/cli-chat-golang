@@ -25,13 +25,17 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// read from config for persistant login
 		config := helpers.ReadConfig()
 
+		// login from config file
 		controllers.Login(config)
 
+		// setup chatroom
 		helpers.ClearScreen()
 		helpers.WelcomeText()
 
+		// event listener for message
 		controllers.Socket.On("message", func(chat models.ChatMessage) {
 			if chat.Username != config.Username {
 				helpers.ClearLine()
@@ -40,6 +44,7 @@ to quickly create a Cobra application.`,
 			}
 		})
 
+		// handle input for chatroom
 		controllers.HandleChatInput(config)
 	},
 }

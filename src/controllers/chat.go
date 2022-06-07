@@ -9,9 +9,11 @@ import (
 	"github.com/shailesz/cli-chat-golang/src/models"
 )
 
+// HandleChatInput sends scanned input from to server.
 func HandleChatInput(config models.Config) {
 	reader := bufio.NewReader(os.Stdin)
 
+	// prompt
 	for {
 		helpers.Prompt()
 		data, _, _ := reader.ReadLine()
@@ -23,6 +25,7 @@ func HandleChatInput(config models.Config) {
 	}
 }
 
+// SendChat emits chat event to server.
 func SendChat(u, m string) {
 	Socket.Emit("chat", models.ChatMessage{Username: u, Data: m, Timestamp: time.Now().UnixNano()})
 }

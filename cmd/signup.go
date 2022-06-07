@@ -16,8 +16,10 @@ var signupCmd = &cobra.Command{
 	Short: "Create a new user",
 	Long:  `Create a new user and get logged in to chat`,
 	Run: func(cmd *cobra.Command, args []string) {
-		u, p := helpers.GetCredentials()
-		controllers.CreateUser(u, p)
+		// get email, username, password
+		e, u, p := helpers.GetCredentials(true)
+
+		controllers.CreateUser(e, u, p)
 	},
 }
 

@@ -13,6 +13,7 @@ import (
 
 var clear map[string]func() //create a map for storing clear funcs
 
+// initConfig initializes an empty config file.
 func initConfig() {
 	var config models.Config
 
@@ -21,6 +22,7 @@ func initConfig() {
 	_ = ioutil.WriteFile("config.json", file, 0644)
 }
 
+// ReadConfig reads from a config file.
 func ReadConfig() models.Config {
 	var jsonFile *os.File
 	var err error
@@ -36,7 +38,7 @@ func ReadConfig() models.Config {
 			byteValue, _ := ioutil.ReadAll(jsonFile)
 			json.Unmarshal(byteValue, &config)
 
-			jsonFile.Close()
+			jsonFile.Close() // file already parsed, closing file
 			break
 		}
 	}
@@ -44,6 +46,7 @@ func ReadConfig() models.Config {
 	return config
 }
 
+// ClearScreen clears the terminal screen.
 func ClearScreen() {
 	clear = make(map[string]func()) //Initialize it
 
