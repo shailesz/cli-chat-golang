@@ -18,6 +18,8 @@ func CreateUser(e, u, p string) {
 		if res.Status == 200 {
 			fmt.Println("Successfully signed up, please continue to login.")
 			services.WriteConfig(user)
+		} else if res.Status == 409 {
+			fmt.Println("email/username combination already exists! Please try again.")
 		} else {
 			fmt.Println("Something went wrong! Please try again.")
 		}
